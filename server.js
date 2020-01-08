@@ -6,12 +6,14 @@ const app = express();
 //Database connection method call
 connectDB();
 
+// Init Middleware (body-parser)
+app.use(express.json({extended: false}));
 
 app.get('/', (req, res)=> res.send('API Running'));
 
 //Routes defined
 app.use('/api/users', require('./routes/api/users'));
-app.use('api/userpost', require('./routes/api/userpost'));
+app.use('/api/userpost', require('./routes/api/userpost'));
 app.use('/api/authentication', require('./routes/api/authentication'));
 app.use('/api/userprofile', require('./routes/api/userprofile'));
 
