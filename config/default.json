@@ -1,3 +1,4 @@
 { //Connection String
-"databaseURI": "mongodb+srv://Sibendu:Mongodb713725@photographer-hub-cluster-01-hwtvl.mongodb.net/test?retryWrites=true&w=majority"
+"databaseURI": "mongodb+srv://Sibendu:Mongodb713725@photographer-hub-cluster-01-hwtvl.mongodb.net/test?retryWrites=true&w=majority",
+"JwtToken" : "SecretToken"
 }
