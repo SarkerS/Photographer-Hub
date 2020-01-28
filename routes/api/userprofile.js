@@ -105,5 +105,43 @@ router.post('/', [auth, //using middleware
             )
 
 
+// Public GET request to get all profile
+
+router.get('/', async (req, res)=> {
+
+    try {
+        const profile = await Profile.find().populate('user', ['name', 'avatar']);
+        res.json(profile);
+
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server error for fetching all profile');
+        
+    }
+})
+
+
+// Public GET request to get a profile by a single user Id
+// here we pass a id in the url as a parameter
+router.get('/user/:user_id', async (req, res)=> { // user_id is the parameter
+
+    try {
+        const profile = await Profile.findOne({user : req.params.user_id }).populate('user', ['name', 'avatar']);
+
+        //Error checking if the profile is there or not!
+        if(!profile)
+            return res.status(400).json({msg: 'Profile does not exists!!'});
+
+        res.json(profile);
+
+    } catch (err) {
+        console.error(err.message);
+        if(err.kind == 'ObjectId') // This is for detecting a special kind of error! User id => "5e29e8a7f17c3814689b5cca" is valid but what if we pass 1 as a user id? it will throw to catch block. therefore we put a msg here also that the user id is not valid
+            return res.status(400).json({msg: 'Profile does not exists!!'});
+        res.status(500).send('Server error for fetching all profile');
+        
+    }
+})
+
 
 module.exports = router;

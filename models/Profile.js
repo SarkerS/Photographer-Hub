@@ -3,7 +3,7 @@ const mongoose = require ('mongoose');
 const ProfileSchema = new mongoose.Schema({
     user: { // this is basically a reference to user model; cause every profile is associated with user
       type: mongoose.Schema.Types.ObjectId, // type is the unique id in the database; not visible in our user model!
-      ref: 'user' // and which model we are referencing
+      ref: 'User' // and which model we are referencing
     },
     organization: {
       type: String
