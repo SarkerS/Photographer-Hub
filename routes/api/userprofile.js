@@ -6,7 +6,7 @@ const router = express.Router();
 const auth = require('../../middleware/auth');
 const Profile = require('../../models/Profile');
 const User = require('../../models/Users');
-const {check, validationResult} = require('express-validator/check');
+const {check, validationResult} = require('express-validator');
 
 
 // Private get request for current user profile
@@ -139,6 +139,27 @@ router.get('/user/:user_id', async (req, res)=> { // user_id is the parameter
         if(err.kind == 'ObjectId') // This is for detecting a special kind of error! User id => "5e29e8a7f17c3814689b5cca" is valid but what if we pass 1 as a user id? it will throw to catch block. therefore we put a msg here also that the user id is not valid
             return res.status(400).json({msg: 'Profile does not exists!!'});
         res.status(500).send('Server error for fetching all profile');
+        
+    }
+})
+
+
+// Private DELETE request to remove user, profile and associated posts
+
+router.delete('/', auth, async (req, res)=> {
+
+    try {
+        // deleting profile
+        await Profile.findOneAndDelete({user: req.user.id});
+
+        //User Removed
+        await User.findOneAndDelete({ _id: req.user.id});
+
+        res.json({msg: 'User and associated posts are removed'});
+
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server error for deleting a profile');
         
     }
 })
