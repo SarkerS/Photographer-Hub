@@ -42,7 +42,7 @@ router.post('/', [auth, //using middleware
                           return res.status(400).json({errors: errors.array()});
                       }
                       
-                      //Building a profile object  
+                      //Taking input  
                       const {
                         organization,
                         website,
@@ -162,6 +162,61 @@ router.delete('/', auth, async (req, res)=> {
         res.status(500).send('Server error for deleting a profile');
         
     }
+})
+
+
+// Private PUT request to add Experience/ could use POST but try new
+
+router.put('/experience', [auth, //using middleware cz private
+            //Checking for the error
+            [check('title', 'What is your Position?').not().isEmpty(),
+            check ('organization', 'Organization name is required.').not().isEmpty(),
+            check ('from', 'When did you engaged with the Organization?').not().isEmpty()]], async (req, res)=> {
+
+            const errors = validationResult(req);
+                    if(!errors.isEmpty()){
+                        return res.status(400).json({errors: errors.array()});
+                    }
+                    
+                    //Taking Input 
+                    const {
+                    title,
+                    organization,
+                    location,
+                    from,
+                    to,
+                    current,
+                    description
+                    } = req.body;
+
+                    //Creating an object
+                    const expObj = {
+                        title,
+                        organization,
+                        location,
+                        from,
+                        to,
+                        current,
+                        description
+                        }
+
+
+
+            try {
+                
+                const profile = await Profile.findOne({user: req.user.id});
+
+                profile.experience.unshift(expObj);
+
+                await profile.save();
+
+                res.json(profile);
+
+            } catch (err) {
+                console.error(err.message);
+                res.status(500).send('Server error for adding an experience in the profile');
+                
+            }
 })
 
 
