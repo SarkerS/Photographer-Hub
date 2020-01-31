@@ -220,4 +220,30 @@ router.put('/experience', [auth, //using middleware cz private
 })
 
 
+// Private DELETE request to remove experiences from the user profile
+
+router.delete('/experience/:exp_id', auth, async (req, res)=> {
+
+    try {
+        const profile = await Profile.findOne({user: req.user.id});
+
+        // get the index number in the experience array to remove it
+        const index = profile.experience.map(item => item.id).indexOf(req.params.exp_id);
+
+        profile.experience.splice(index, 1) // splicing the particular experience
+
+        await profile.save();
+
+        res.json(profile);
+        
+
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server error for deleting an Experience');
+        
+    }
+})
+
+
+
 module.exports = router;
