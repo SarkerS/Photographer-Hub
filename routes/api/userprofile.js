@@ -246,4 +246,84 @@ router.delete('/experience/:exp_id', auth, async (req, res)=> {
 
 
 
+// Private PUT request to add Education/ could use POST but try new
+
+router.put('/education', [auth, //using middleware cz private
+    //Checking for the error
+    [check('school', 'What is your School?').not().isEmpty(),
+    check ('fieldofstudy', 'Program name is required.').not().isEmpty(),
+    check ('from', 'When did you start the School?').not().isEmpty()]], async (req, res)=> {
+
+    const errors = validationResult(req);
+            if(!errors.isEmpty()){
+                return res.status(400).json({errors: errors.array()});
+            }
+            
+            //Taking Input 
+            const {
+            school,
+            degree,
+            fieldofstudy,
+            from,
+            to,
+            current,
+            description
+            } = req.body;
+
+            //Creating an object
+            const eduObj = {
+            school,
+            degree,
+            fieldofstudy,
+            from,
+            to,
+            current,
+            description
+                }
+
+
+
+    try {
+        
+        const profile = await Profile.findOne({user: req.user.id});
+
+        profile.education.unshift(eduObj);
+
+        await profile.save();
+
+        res.json(profile);
+
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server error for adding an education in the profile');
+        
+    }
+})
+
+
+// Private DELETE request to remove education from the user profile
+
+router.delete('/education/:edu_id', auth, async (req, res)=> {
+
+try {
+const profile = await Profile.findOne({user: req.user.id});
+
+// get the index number in the education array to remove it
+const index = profile.education.map(item => item.id).indexOf(req.params.edu_id);
+
+profile.education.splice(index, 1) // splicing the particular education
+
+await profile.save();
+
+res.json(profile);
+
+
+} catch (err) {
+console.error(err.message);
+res.status(500).send('Server error for deleting an Education');
+
+}
+})
+
+
 module.exports = router;
