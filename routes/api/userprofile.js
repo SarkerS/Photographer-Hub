@@ -2,12 +2,15 @@
 // like a get request for the current user proifile(e.g. private based on current token) or all user profile
 
 const express = require('express');
+const request = require('request');
+const config = require ('config');
 const router = express.Router();
 const auth = require('../../middleware/auth');
 const Profile = require('../../models/Profile');
 const User = require('../../models/Users');
 const {check, validationResult} = require('express-validator');
 
+  
 
 // Private get request for current user profile
 router.get('/currentuser', auth, async (req, res) => { // '/currentuser' defines the endpoint (in the URL) of the request for the current user 
@@ -324,6 +327,10 @@ res.status(500).send('Server error for deleting an Education');
 
 }
 })
+
+
+
+
 
 
 module.exports = router;
