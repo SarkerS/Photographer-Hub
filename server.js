@@ -9,6 +9,9 @@ connectDB();
 // Init Middleware (body-parser)
 app.use(express.json({extended: false}));
 
+//Making 'UserPostImages' folder public so that we don't have to cretae any extra route for postimage access
+app.use('/UserPostImages', express.static('UserPostImages'));
+
 app.get('/', (req, res)=> res.send('API Running'));
 
 //Routes defined
