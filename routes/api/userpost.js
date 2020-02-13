@@ -154,5 +154,62 @@ router.get('/:post_id', auth, async (req, res) => {
 
 
 
+// Private PUT request to like userpost by ID (single post)
+router.put('/like/:post_id', auth, async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.post_id);
+
+    // Check if the post has already been liked
+    if (
+      post.likes.filter(like => like.user.toString() === req.user.id).length > 0 
+    ) {
+      return res.status(400).json({ msg: 'Post already liked' });
+    }
+
+    post.likes.unshift({ user: req.user.id }); // we could use push but to put the most recent like at the begining used unshift
+
+    await post.save();
+
+    res.json(post.likes);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server Error for liking Userpost!');
+  }
+});
+
+
+// Private PUT request to unlike userpost by ID (single post)
+router.put('/unlike/:post_id', auth, async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.post_id);
+
+    // Check if the post has already been liked, if it's not liked there is nothing to unlike
+    if (
+      post.likes.filter(like => like.user.toString() === req.user.id).length ===
+      0
+    ) {
+      return res.status(400).json({ msg: 'Post has not yet been liked' });
+    }
+
+    // Get remove index
+    const removeIndex = post.likes
+      .map(like => like.user.toString())
+      .indexOf(req.user.id);
+
+    post.likes.splice(removeIndex, 1);
+
+    await post.save();
+
+    res.json(post.likes);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server Error for unliking Userpost!');
+  }
+});
+
+
+
+
+
 
 module.exports = router;
