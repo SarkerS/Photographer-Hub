@@ -215,7 +215,7 @@ router.post(
   '/comment/:post_id',
   [
     auth,
-    [
+    [ // must sat something in the post
       check('text', 'Text is required')
         .not()
         .isEmpty()
@@ -245,12 +245,46 @@ router.post(
       res.json(post.comments);
     } catch (err) {
       console.error(err.message);
-      res.status(500).send('Server Error');
+      res.status(500).send('Server Error for commenting in a post!!!');
     }
   }
 );
 
 
 
+
+// Private DELETE request to delete comment in userpost by postID and commentID (single comment)
+router.delete('/comment/:post_id/:comment_id', auth, async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.post_id);
+
+    // Pull out comment
+    const comment = post.comments.find(comment => comment.id === req.params.comment_id);
+
+    // Check if comment exists
+    if (!comment) {
+      return res.status(404).json({ msg: 'Comment does not exist' });
+    }
+
+    // User verification
+    if (comment.user.toString() !== req.user.id) {
+      return res.status(401).json({ msg: 'User not authorized' });
+    }
+
+    // Get remove index
+    const removeIndex = post.comments
+      .map(comment => comment.id)
+      .indexOf(req.params.comment_id);
+
+    post.comments.splice(removeIndex, 1);
+
+    await post.save();
+
+    res.json(post.comments);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server Error for deleting comment');
+  }
+});
 
 module.exports = router;
